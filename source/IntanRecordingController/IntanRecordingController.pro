@@ -84,4 +84,9 @@ INCLUDEPATH += $$PWD/../../../Downloads
 DEPENDPATH += $$PWD/../../../Downloads
 }
 
-unix:LIBS += -L./ -l okFrontPanel -ldl
+unix:{
+LIBS += -L"../../Opal Kelly library files/Linux 64-bit/" -l okFrontPanel -ldl
+oklibrary.path = ./
+oklibrary.files += "../../Opal Kelly library files/Linux 64-bit/libokFrontPanel.so"
+INSTALLS += oklibrary
+}
