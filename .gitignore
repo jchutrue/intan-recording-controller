@@ -1,5 +1,6 @@
 *.o
 Makefile
 moc*
-.qmake.stash
+*qmake*
 qrc*
+*pro.user
