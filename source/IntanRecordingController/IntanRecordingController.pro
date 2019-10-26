@@ -2,7 +2,7 @@ TEMPLATE      = app
 
 QT            += widgets multimedia
 
-CONFIG        += static
+#CONFIG        += static
 
 macx:{
 QMAKE_RPATHDIR += /users/intan/qt/5.7/clang_64/lib
@@ -82,4 +82,11 @@ macx:{
 LIBS += -L$$PWD/../../../Downloads/ -lokFrontPanel
 INCLUDEPATH += $$PWD/../../../Downloads
 DEPENDPATH += $$PWD/../../../Downloads
+}
+
+unix:{
+LIBS += -L"../../Opal Kelly library files/Linux 64-bit/" -l okFrontPanel -ldl
+oklibrary.path = ./
+oklibrary.files += "../../Opal Kelly library files/Linux 64-bit/libokFrontPanel.so"
+INSTALLS += oklibrary
 }
