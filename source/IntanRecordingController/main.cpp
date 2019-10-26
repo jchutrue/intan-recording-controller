@@ -1,8 +1,8 @@
 //  ------------------------------------------------------------------------
 //
 //  This file is part of the Intan Technologies RHD2000 Interface
-//  Version 2.06
-//  Copyright (C) 2013-2018 Intan Technologies
+//  Version 2.07
+//  Copyright (C) 2013-2019 Intan Technologies
 //
 //  ------------------------------------------------------------------------
 //
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]){
 #endif
 
     splash->show();
-    splash->showMessage(QObject::tr("Starting Intan Technologies Recording Controller v2.06..."), Qt::AlignCenter | Qt::AlignBottom, Qt::black);
+    splash->showMessage(QObject::tr("Starting Intan Technologies Recording Controller v2.07..."), Qt::AlignCenter | Qt::AlignBottom, Qt::black);
 
     MainWindow mainWin;
     mainWin.show();

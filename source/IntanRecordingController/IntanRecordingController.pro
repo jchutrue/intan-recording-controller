@@ -2,7 +2,7 @@ TEMPLATE      = app
 
 QT            += widgets multimedia
 
-#CONFIG        += static
+CONFIG        += static
 
 macx:{
 QMAKE_RPATHDIR += /users/intan/qt/5.7/clang_64/lib
@@ -83,5 +83,3 @@ LIBS += -L$$PWD/../../../Downloads/ -lokFrontPanel
 INCLUDEPATH += $$PWD/../../../Downloads
 DEPENDPATH += $$PWD/../../../Downloads
 }
-
-unix:LIBS += -L./ -l okFrontPanel -ldl

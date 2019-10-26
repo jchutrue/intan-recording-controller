@@ -1,8 +1,8 @@
 //  ------------------------------------------------------------------------
 //
 //  This file is part of the Intan Technologies RHD2000 Interface
-//  Version 2.06
-//  Copyright (C) 2013-2018 Intan Technologies
+//  Version 2.07
+//  Copyright (C) 2013-2019 Intan Technologies
 //
 //  ------------------------------------------------------------------------
 //
@@ -1303,8 +1303,8 @@ void MainWindow::about()
 {
     QMessageBox::about(this, tr("About Intan Technologies Recording Controller"),
             tr("<h2>Intan Technologies Recording Controller</h2>"
-               "<p>Version 2.06"
-               "<p>Copyright &copy; 2013-2018 Intan Technologies"
+               "<p>Version 2.07"
+               "<p>Copyright &copy; 2013-2019 Intan Technologies"
                "<p>This biopotential recording application controls the "
                "512 Channel Recording Controller or 1024 Channel Recording Controller "
                "from Intan Technologies.  The C++/Qt source code "
@@ -4191,30 +4191,39 @@ void MainWindow::runImpedanceMeasurement()
     }
 
     SignalChannel *signalChannel;
-    double distance, minDistance, current, Cseries;
+    double current, Cseries;
     double impedanceMagnitude, impedancePhase;
 
-    const double bestAmplitude = 250.0;  // we favor voltage readings that are closest to 250 uV: not too large,
-                                         // and not too small.
     const double dacVoltageAmplitude = 128 * (1.225 / 256);  // this assumes the DAC amplitude was set to 128
-    const double parasiticCapacitance = 10.0e-12;  // 10 pF: an estimate of on-chip parasitic capacitance,
+    const double parasiticCapacitance = 15.0e-12;  // 15 pF: an estimate of on-chip parasitic capacitance,
                                                    // including effective amplifier input capacitance.
     double relativeFreq = actualImpedanceFreq / boardSampleRate;
 
     int bestAmplitudeIndex;
+    double saturationVoltage = approximateSaturationVoltage(actualImpedanceFreq, actualUpperBandwidth);
+
     for (stream = 0; stream < evalBoard->getNumEnabledDataStreams(); ++stream) {
         for (channel = 0; channel < 32; ++channel) {
             signalChannel = signalSources->findAmplifierChannel(stream, channel);
             if (signalChannel) {
-                minDistance = 9.9e99;  // ridiculously large number
-                for (capRange = 0; capRange < 3; ++capRange) {
-                    // Find the measured amplitude that is closest to bestAmplitude on a logarithmic scale
-                    distance = qAbs(qLn(measuredMagnitude[stream][channel][capRange] / bestAmplitude));
-                    if (distance < minDistance) {
-                        bestAmplitudeIndex = capRange;
-                        minDistance = distance;
+
+                // Make sure chosen capacitor is below saturation voltage
+                if (measuredMagnitude[stream][channel][2] < saturationVoltage) {
+                    bestAmplitudeIndex = 2;
+                } else if (measuredMagnitude[stream][channel][1] < saturationVoltage) {
+                    bestAmplitudeIndex = 1;
+                } else {
+                    bestAmplitudeIndex = 0;
+                }
+
+                // If C2 and C3 are too close, C3 is probably saturated. Ignore C3
+                double capRatio = measuredMagnitude[stream][channel][1] / measuredMagnitude[stream][channel][2];
+                if (capRatio > 0.2) {
+                    if (bestAmplitudeIndex == 2) {
+                        bestAmplitudeIndex = 1;
                     }
                 }
+
                 switch (bestAmplitudeIndex) {
                 case 0:
                     Cseries = 0.1e-12;
@@ -4242,10 +4251,11 @@ void MainWindow::runImpedanceMeasurement()
                 factorOutParallelCapacitance(impedanceMagnitude, impedancePhase, actualImpedanceFreq,
                                              parasiticCapacitance);
 
-                // Perform empirical resistance correction to improve accuarcy at sample rates below
+                // Perform empirical resistance correction to improve accuracy at sample rates below
                 // 15 kS/s.
-                empiricalResistanceCorrection(impedanceMagnitude, impedancePhase,
-                                              boardSampleRate);
+                // NOTE: After refining the impedance measurement algorithm, Intan has determined this empirical correction is no longer necessary for accurate measurements
+                //empiricalResistanceCorrection(impedanceMagnitude, impedancePhase,
+                                              //boardSampleRate);
 
                 signalChannel->electrodeImpedanceMagnitude = impedanceMagnitude;
                 signalChannel->electrodeImpedancePhase = impedancePhase;
@@ -4311,6 +4321,18 @@ void MainWindow::runImpedanceMeasurement()
     showImpedances(true);
     wavePlot->setFocus();
 }
+
+
+// Use a 2nd order Low Pass Filter to model the approximate voltage at which the amplifiers saturate
+// which depends on the impedance frequency and the amplifier bandwidth.
+double MainWindow::approximateSaturationVoltage(double actualZFreq, double highCutoff)
+{
+    if (actualZFreq < 0.2 * highCutoff)
+        return 5000.0;
+    else
+        return 5000.0 * sqrt(1.0 / (1.0 + pow(3.3333 * actualZFreq / highCutoff, 4)));
+}
+
 
 // Given a measured complex impedance that is the result of an electrode impedance in parallel
 // with a parasitic capacitance (i.e., due to the amplifier input capacitance and other

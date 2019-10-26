@@ -1,8 +1,8 @@
 //  ------------------------------------------------------------------------
 //
 //  This file is part of the Intan Technologies RHD2000 Interface
-//  Version 2.06
-//  Copyright (C) 2013-2018 Intan Technologies
+//  Version 2.07
+//  Copyright (C) 2013-2019 Intan Technologies
 //
 //  ------------------------------------------------------------------------
 //

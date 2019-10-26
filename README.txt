@@ -1,4 +1,4 @@
-Intan Recording Controller Software - Source Code (v2.06)
+Intan Recording Controller Software - Source Code (v2.07)
 ---------------------------------------------------------
 
 This directory contains the Intan Recording Controller C++/Qt source code and two supporting files:

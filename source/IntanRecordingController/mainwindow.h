@@ -202,6 +202,8 @@ private:
     void updateAuxDigOut();
     void referenceSetChannel();
 
+    double approximateSaturationVoltage(double actualZFreq, double highCutoff);
+
     int ttlOut[16];
     int evalBoardMode;
     int numSpiPorts;

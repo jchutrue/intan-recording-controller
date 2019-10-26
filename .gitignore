@@ -1,3 +1,5 @@
 *.o
 Makefile
 moc*
+.qmake.stash
+qrc*
