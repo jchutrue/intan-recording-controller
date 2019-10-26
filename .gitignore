@@ -1,6 +1,10 @@
-*.o
-Makefile
 moc*
-*qmake*
 qrc*
-*pro.user
+*.o
+*.so
+*.pro.user
+.qmake.stash
+Makefile
+IntanRecordingController
+
+
